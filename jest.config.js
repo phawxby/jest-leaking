@@ -4,7 +4,8 @@
 const config = {
   verbose: false,
   collectCoverage: false,
-  testPathIgnorePatterns: ['template.test.js']
+  testPathIgnorePatterns: ['template.test.js'],
+  transform: {}
 };
 
 module.exports = config;

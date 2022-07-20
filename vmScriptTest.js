@@ -1,0 +1,232 @@
+const { Script } = require('vm');
+const { readFileSync, writeFileSync } = require('fs');
+const { join } = require('path');
+
+const modules = [
+    'node_modules/@babel/code-frame/lib/index.js',
+    'node_modules/@babel/helper-validator-identifier/lib/identifier.js',
+    'node_modules/@babel/helper-validator-identifier/lib/index.js',
+    'node_modules/@babel/helper-validator-identifier/lib/keyword.js',
+    'node_modules/@babel/highlight/lib/index.js',
+    'node_modules/@babel/types/lib/asserts/assertNode.js',
+    'node_modules/@babel/types/lib/asserts/generated/index.js',
+    'node_modules/@babel/types/lib/builders/flow/createFlowUnionType.js',
+    'node_modules/@babel/types/lib/builders/flow/createTypeAnnotationBasedOnTypeof.js',
+    'node_modules/@babel/types/lib/builders/generated/index.js',
+    'node_modules/@babel/types/lib/builders/generated/uppercase.js',
+    'node_modules/@babel/types/lib/builders/react/buildChildren.js',
+    'node_modules/@babel/types/lib/builders/typescript/createTSUnionType.js',
+    'node_modules/@babel/types/lib/builders/validateNode.js',
+    'node_modules/@babel/types/lib/clone/clone.js',
+    'node_modules/@babel/types/lib/clone/cloneDeep.js',
+    'node_modules/@babel/types/lib/clone/cloneDeepWithoutLoc.js',
+    'node_modules/@babel/types/lib/clone/cloneNode.js',
+    'node_modules/@babel/types/lib/clone/cloneWithoutLoc.js',
+    'node_modules/@babel/types/lib/comments/addComment.js',
+    'node_modules/@babel/types/lib/comments/addComments.js',
+    'node_modules/@babel/types/lib/comments/inheritInnerComments.js',
+    'node_modules/@babel/types/lib/comments/inheritLeadingComments.js',
+    'node_modules/@babel/types/lib/comments/inheritTrailingComments.js',
+    'node_modules/@babel/types/lib/comments/inheritsComments.js',
+    'node_modules/@babel/types/lib/comments/removeComments.js',
+    'node_modules/@babel/types/lib/constants/generated/index.js',
+    'node_modules/@babel/types/lib/constants/index.js',
+    'node_modules/@babel/types/lib/converters/ensureBlock.js',
+    'node_modules/@babel/types/lib/converters/gatherSequenceExpressions.js',
+    'node_modules/@babel/types/lib/converters/toBindingIdentifierName.js',
+    'node_modules/@babel/types/lib/converters/toBlock.js',
+    'node_modules/@babel/types/lib/converters/toComputedKey.js',
+    'node_modules/@babel/types/lib/converters/toExpression.js',
+    'node_modules/@babel/types/lib/converters/toIdentifier.js',
+    'node_modules/@babel/types/lib/converters/toKeyAlias.js',
+    'node_modules/@babel/types/lib/converters/toSequenceExpression.js',
+    'node_modules/@babel/types/lib/definitions/core.js',
+    'node_modules/@babel/types/lib/definitions/experimental.js',
+    'node_modules/@babel/types/lib/definitions/flow.js',
+    'node_modules/@babel/types/lib/definitions/index.js',
+    'node_modules/@babel/types/lib/definitions/jsx.js',
+    'node_modules/@babel/types/lib/definitions/misc.js',
+    'node_modules/@babel/types/lib/definitions/placeholders.js',
+    'node_modules/@babel/types/lib/definitions/typescript.js',
+    'node_modules/@babel/types/lib/definitions/utils.js',
+    'node_modules/@babel/types/lib/index.js',
+    'node_modules/@babel/types/lib/modifications/flow/removeTypeDuplicates.js',
+    'node_modules/@babel/types/lib/modifications/removeProperties.js',
+    'node_modules/@babel/types/lib/modifications/removePropertiesDeep.js',
+    'node_modules/@babel/types/lib/modifications/typescript/removeTypeDuplicates.js',
+    'node_modules/@babel/types/lib/retrievers/getBindingIdentifiers.js',
+    'node_modules/@babel/types/lib/traverse/traverseFast.js',
+    'node_modules/@babel/types/lib/utils/inherit.js',
+    'node_modules/@babel/types/lib/utils/react/cleanJSXElementLiteralChild.js',
+    'node_modules/@babel/types/lib/utils/shallowEqual.js',
+    'node_modules/@babel/types/lib/validators/buildMatchMemberExpression.js',
+    'node_modules/@babel/types/lib/validators/generated/index.js',
+    'node_modules/@babel/types/lib/validators/is.js',
+    'node_modules/@babel/types/lib/validators/isNode.js',
+    'node_modules/@babel/types/lib/validators/isPlaceholderType.js',
+    'node_modules/@babel/types/lib/validators/isType.js',
+    'node_modules/@babel/types/lib/validators/isValidIdentifier.js',
+    'node_modules/@babel/types/lib/validators/matchesPattern.js',
+    'node_modules/@babel/types/lib/validators/react/isCompatTag.js',
+    'node_modules/@babel/types/lib/validators/react/isReactComponent.js',
+    'node_modules/@babel/types/lib/validators/validate.js',
+    'node_modules/@jest/expect-utils/build/index.js',
+    'node_modules/@jest/expect-utils/build/jasmineUtils.js',
+    'node_modules/@jest/expect-utils/build/utils.js',
+    'node_modules/@jest/expect/build/index.js',
+    'node_modules/@jest/transform/build/ScriptTransformer.js',
+    'node_modules/@jest/transform/build/enhanceUnexpectedTokenMessage.js',
+    'node_modules/@jest/transform/build/index.js',
+    'node_modules/@jest/transform/build/runtimeErrorsAndWarnings.js',
+    'node_modules/@jest/transform/build/shouldInstrument.js',
+    'node_modules/ansi-regex/index.js',
+    'node_modules/braces/index.js',
+    'node_modules/braces/lib/compile.js',
+    'node_modules/braces/lib/constants.js',
+    'node_modules/braces/lib/expand.js',
+    'node_modules/braces/lib/parse.js',
+    'node_modules/braces/lib/stringify.js',
+    'node_modules/braces/lib/utils.js',
+    'node_modules/buffer-from/index.js',
+    'node_modules/ci-info/index.js',
+    'node_modules/diff-sequences/build/index.js',
+    'node_modules/escape-string-regexp/index.js',
+    'node_modules/expect/build/asymmetricMatchers.js',
+    'node_modules/expect/build/extractExpectedAssertionsErrors.js',
+    'node_modules/expect/build/index.js',
+    'node_modules/expect/build/jestMatchersObject.js',
+    'node_modules/expect/build/matchers.js',
+    'node_modules/expect/build/print.js',
+    'node_modules/expect/build/spyMatchers.js',
+    'node_modules/expect/build/toThrowMatchers.js',
+    'node_modules/fill-range/index.js',
+    'node_modules/graceful-fs/clone.js',
+    'node_modules/graceful-fs/graceful-fs.js',
+    'node_modules/graceful-fs/legacy-streams.js',
+    'node_modules/graceful-fs/polyfills.js',
+    'node_modules/is-number/index.js',
+    'node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js',
+    'node_modules/jest-diff/build/cleanupSemantic.js',
+    'node_modules/jest-diff/build/constants.js',
+    'node_modules/jest-diff/build/diffLines.js',
+    'node_modules/jest-diff/build/diffStrings.js',
+    'node_modules/jest-diff/build/getAlignedDiffs.js',
+    'node_modules/jest-diff/build/index.js',
+    'node_modules/jest-diff/build/joinAlignedDiffs.js',
+    'node_modules/jest-diff/build/normalizeDiffOptions.js',
+    'node_modules/jest-diff/build/printDiffs.js',
+    'node_modules/jest-get-type/build/index.js',
+    'node_modules/jest-matcher-utils/build/Replaceable.js',
+    'node_modules/jest-matcher-utils/build/deepCyclicCopyReplaceable.js',
+    'node_modules/jest-matcher-utils/build/index.js',
+    'node_modules/jest-message-util/build/index.js',
+    'node_modules/jest-regex-util/build/index.js',
+    'node_modules/jest-snapshot/build/InlineSnapshots.js',
+    'node_modules/jest-snapshot/build/SnapshotResolver.js',
+    'node_modules/jest-snapshot/build/State.js',
+    'node_modules/jest-snapshot/build/colors.js',
+    'node_modules/jest-snapshot/build/dedentLines.js',
+    'node_modules/jest-snapshot/build/index.js',
+    'node_modules/jest-snapshot/build/mockSerializer.js',
+    'node_modules/jest-snapshot/build/plugins.js',
+    'node_modules/jest-snapshot/build/printSnapshot.js',
+    'node_modules/jest-snapshot/build/utils.js',
+    'node_modules/jest-util/build/ErrorWithStack.js',
+    'node_modules/jest-util/build/clearLine.js',
+    'node_modules/jest-util/build/convertDescriptorToString.js',
+    'node_modules/jest-util/build/createDirectory.js',
+    'node_modules/jest-util/build/createProcessObject.js',
+    'node_modules/jest-util/build/deepCyclicCopy.js',
+    'node_modules/jest-util/build/formatTime.js',
+    'node_modules/jest-util/build/globsToMatcher.js',
+    'node_modules/jest-util/build/index.js',
+    'node_modules/jest-util/build/installCommonGlobals.js',
+    'node_modules/jest-util/build/interopRequireDefault.js',
+    'node_modules/jest-util/build/isInteractive.js',
+    'node_modules/jest-util/build/isPromise.js',
+    'node_modules/jest-util/build/pluralize.js',
+    'node_modules/jest-util/build/preRunMessage.js',
+    'node_modules/jest-util/build/replacePathSepForGlob.js',
+    'node_modules/jest-util/build/requireOrImportModule.js',
+    'node_modules/jest-util/build/setGlobal.js',
+    'node_modules/jest-util/build/specialChars.js',
+    'node_modules/jest-util/build/testPathPatternToRegExp.js',
+    'node_modules/jest-util/build/tryRealpath.js',
+    'node_modules/js-tokens/index.js',
+    'node_modules/micromatch/index.js',
+    'node_modules/natural-compare/index.js',
+    'node_modules/picomatch/index.js',
+    'node_modules/picomatch/lib/constants.js',
+    'node_modules/picomatch/lib/parse.js',
+    'node_modules/picomatch/lib/picomatch.js',
+    'node_modules/picomatch/lib/scan.js',
+    'node_modules/picomatch/lib/utils.js',
+    'node_modules/pretty-format/build/collections.js',
+    'node_modules/pretty-format/build/index.js',
+    'node_modules/pretty-format/build/plugins/AsymmetricMatcher.js',
+    'node_modules/pretty-format/build/plugins/ConvertAnsi.js',
+    'node_modules/pretty-format/build/plugins/DOMCollection.js',
+    'node_modules/pretty-format/build/plugins/DOMElement.js',
+    'node_modules/pretty-format/build/plugins/Immutable.js',
+    'node_modules/pretty-format/build/plugins/ReactElement.js',
+    'node_modules/pretty-format/build/plugins/ReactTestComponent.js',
+    'node_modules/pretty-format/build/plugins/lib/escapeHTML.js',
+    'node_modules/pretty-format/build/plugins/lib/markup.js',
+    'node_modules/pretty-format/node_modules/ansi-styles/index.js',
+    'node_modules/react-is/cjs/react-is.development.js',
+    'node_modules/react-is/index.js',
+    'node_modules/slash/index.js',
+    'node_modules/source-map-support/source-map-support.js',
+    'node_modules/source-map/lib/array-set.js',
+    'node_modules/source-map/lib/base64-vlq.js',
+    'node_modules/source-map/lib/base64.js',
+    'node_modules/source-map/lib/binary-search.js',
+    'node_modules/source-map/lib/mapping-list.js',
+    'node_modules/source-map/lib/quick-sort.js',
+    'node_modules/source-map/lib/source-map-consumer.js',
+    'node_modules/source-map/lib/source-map-generator.js',
+    'node_modules/source-map/lib/source-node.js',
+    'node_modules/source-map/lib/util.js',
+    'node_modules/source-map/source-map.js',
+    'node_modules/stack-utils/index.js',
+    'node_modules/to-fast-properties/index.js',
+    'node_modules/to-regex-range/index.js'
+];
+
+const iterations = 1500;
+const increaseMap = [];
+const start = process.memoryUsage().heapUsed / 1024 / 1024;
+
+for (const file of modules) {
+    console.log(`Testing: ${file} - ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB`);
+
+    let trip = false;
+    let heapHistory = [process.memoryUsage().heapUsed / 1024 / 1024];
+    let startDiff;
+
+    for (let i = 0; i < iterations; i++) {
+        const fileContents = readFileSync(join(__dirname, file));
+        new Script(fileContents);
+
+        const newHeap = process.memoryUsage().heapUsed / 1024 / 1024;
+
+        startDiff = newHeap - heapHistory[0];
+        heapHistory.push(newHeap);
+    }
+
+    increaseMap.push([file, startDiff]);
+}
+
+const end = process.memoryUsage().heapUsed / 1024 / 1024;
+const sorted = increaseMap.sort((a,b) =>  b[1] - a[1]).map((x) => [x[0], `${x[1].toFixed(2)}MB`]);
+const resultsFilename = join(__dirname, 'results', `vmScript - ${process.version}.txt`);
+
+writeFileSync(resultsFilename, `Results:
+Node Version: ${process.version}
+Start: ${start.toFixed(2)}MB
+End: ${end.toFixed(2)}MB
+Iterations: ${iterations}
+
+Increase between first load of file and after ${iterations} iterations.
+${JSON.stringify(sorted, undefined, 2)}
+`);
