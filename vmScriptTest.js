@@ -200,7 +200,6 @@ const start = process.memoryUsage().heapUsed / 1024 / 1024;
 for (const file of modules) {
     console.log(`Testing: ${file} - ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB`);
 
-    let trip = false;
     let heapHistory = [process.memoryUsage().heapUsed / 1024 / 1024];
     let startDiff;
 

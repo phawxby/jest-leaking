@@ -6,7 +6,7 @@ Make sure to `npm install` first.
 
 * `npm run create` - Creates individual test files
 * `npm run test` - Runs tests using jest
-* `npm run test-vm-script` - This simply loads a bunch of different modules via `vm.Script` iteratively based on logging a bunch of files that Jest loads via vm.Script. 
+* `npm run test-vm-script-node` - This simply loads a bunch of different modules via `vm.Script` iteratively based on logging a bunch of files that Jest loads via vm.Script. 
 
 ## Results
 

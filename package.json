@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "node --max-heap-size=100 jest",
     "create": "node ./createTests.js",
-    "test-vm-script": "node vmScriptTest.js"
+    "test-vm-script-node": "node --max-heap-size=100 vmScriptTest.js"
   },
   "author": "",
   "license": "ISC",
